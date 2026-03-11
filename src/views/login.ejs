@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PassPort Inc. — Iniciar sesión</title>
+  <!--css viene desde la carpeta public-->
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+
+  <!--card-wrapper centra la tarjeta en la pantalla-->
+  <div class="card-wrapper">
+    <div class="card">
+
+      <!--marca del proyecto-->
+      <div class="brand-logo">PassPort Inc.</div>
+      <div class="brand-tagline">Gestión de identidad digital</div>
+
+      <h1>Bienvenido</h1>
+      <p class="subtitle">Ingresá tus credenciales para continuar</p>
+
+      <!--para mostrar el error solo si existe-->
+      <% if (error) { %>
+        <div class="alert"><%= error %></div>
+      <% } %>
+
+      <!--para mostrar mensaje de exito si viene de registrarse-->
+      <% if (query && query.registered) { %>
+        <div class="alert-success">✓ Registro exitoso. Ya podés iniciar sesión.</div>
+      <% } %>
+
+      <!--el token csrf va en un campo oculto dentro del formulario-->
+      <form method="POST" action="/login">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            required
+            autocomplete="email"
+            placeholder="tu@email.com"
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="password">Contraseña</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            required
+            autocomplete="current-password"
+            placeholder="••••••••"
+          >
+        </div>
+
+        <!--tipo de autenticacion-->
+        <div class="form-group">
+          <p class="auth-type-title">Tipo de sesión</p>
+          <div class="auth-type">
+            <div>
+              <!--session esta seleccionado por defecto-->
+              <input type="radio" id="type_session" name="type" value="session" checked>
+              <label for="type_session">🍪 Cookie</label>
+            </div>
+            <div>
+              <input type="radio" id="type_jwt" name="type" value="jwt">
+              <label for="type_jwt">🔑 JWT</label>
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn">Iniciar sesión</button>
+      </form>
+
+      <div class="footer-link">
+        ¿No tenés cuenta? <a href="/register">Registrate</a>
+      </div>
+
+    </div>
+  </div>
+
+</body>
+</html>
