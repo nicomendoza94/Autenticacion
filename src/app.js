@@ -44,7 +44,7 @@ app.use(helmet({
       //para cargar fuentes de google fonts
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
       fontSrc: ["'self'", "https://fonts.gstatic.com"],
-      scriptSrc: ["'self'"]
+      scriptSrc: ["'self'", "'unsafe-inline'"]
     }
   }
 }));

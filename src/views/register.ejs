@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PassPort Inc. — Registro</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+
+  <div class="card-wrapper">
+    <div class="card">
+
+      <div class="brand-logo">PassPort Inc.</div>
+      <div class="brand-tagline">Gestión de identidad digital</div>
+
+      <h1>Crear cuenta</h1>
+      <p class="subtitle">Completá los datos para registrarte</p>
+
+      <!--se muestra el error solo si existe-->
+      <% if (error) { %>
+        <div class="alert"><%= error %></div>
+      <% } %>
+
+      <form method="POST" action="/register">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            required
+            autocomplete="email"
+            placeholder="tu@email.com"
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="password">Contraseña</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            required
+            autocomplete="new-password"
+            placeholder="••••••••"
+          >
+          <!--ndicadores visuales de requisitos de contraseña-->
+          <div class="password-hints">
+            <span class="hint" id="hint-len">8+ caracteres</span>
+            <span class="hint" id="hint-upper">Mayúscula</span>
+            <span class="hint" id="hint-num">Número</span>
+          </div>
+        </div>
+
+        <button type="submit" class="btn">Crear cuenta</button>
+      </form>
+
+      <div class="footer-link">
+        ¿Ya tenés cuenta? <a href="/login">Iniciá sesión</a>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    //logica para actualizar los indicadores de contraseña en tiempo real
+    const pwd = document.getElementById('password');
+    const hintLen = document.getElementById('hint-len');
+    const hintUpper = document.getElementById('hint-upper');
+    const hintNum = document.getElementById('hint-num');
+
+    pwd.addEventListener('input', () => {
+      const v = pwd.value;
+      //agrega la clase ok si el requisito se cumple y si no saca
+      hintLen.classList.toggle('ok', v.length >= 8);
+      hintUpper.classList.toggle('ok', /[A-Z]/.test(v));
+      hintNum.classList.toggle('ok', /[0-9]/.test(v));
+    });
+  </script>
+
+</body>
+</html>
