@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PassPort Inc. — Dashboard</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+
+  <!--navbar fijo en la parte superior-->
+  <nav>
+    <div class="nav-brand">PassPort Inc.</div>
+    <div class="nav-right">
+      <!--se muestra el email del usuario autenticado-->
+      <span class="nav-email"><%= user.email %></span>
+
+      <!--badge que muestra el rol con color diferente segun sea usuario o admin -->
+      <span class="badge <%= user.rol === 'administrador' ? 'badge-admin' : 'badge-user' %>">
+        <%= user.rol %>
+      </span>
+
+      <!--formulario de logout con proteccion csrf-->
+      <form method="POST" action="/logout" style="display:inline">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <button type="submit" class="btn-logout">Salir</button>
+      </form>
+    </div>
+  </nav>
+
+  <main>
+
+    <!--se muestra el error solo si existe -->
+    <% if (error) { %>
+      <div class="alert"><%= error %></div>
+    <% } %>
+
+    <div class="welcome">
+      <!--se muestra solo la parte antes del @ del email como nombre -->
+      <h1>Hola, <%= user.email.split('@')[0] %></h1>
+      <p class="subtitle">Tu sesión está activa. Acá está la información de tu cuenta.</p>
+    </div>
+
+    <!--tarjetas con informacion del usuario -->
+    <div class="cards">
+      <div class="info-card">
+        <div class="info-card-label">ID de usuario</div>
+        <div class="info-card-value accent">#<%= user.id %></div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-label">Email</div>
+        <div class="info-card-value"><%= user.email %></div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-label">Rol</div>
+        <!--el color cambia de acuerdo al rol -->
+        <div class="info-card-value <%= user.rol === 'administrador' ? 'admin-color' : 'accent' %>">
+          <%= user.rol %>
+        </div>
+      </div>
+    </div>
+
+    <!--solo aparece si el usuario es administrador -->
+    <% if (user.rol === 'administrador') { %>
+      <div class="admin-section">
+        <div>
+          <strong>Panel de administración</strong>
+          <p>Ver usuarios registrados, eliminar cuentas y revisar los logs de seguridad.</p>
+        </div>
+        <a href="/admin" class="btn-admin">Ir al panel →</a>
+      </div>
+    <% } %>
+
+  </main>
+
+</body>
+</html>

@@ -16,8 +16,7 @@ const session = require('express-session');
 //connect-pg-simple guarda las sesiones en postegresql
 const pgSession = require('connect-pg-simple')(session);
 
-//csrf-csrf implementa la proteccion contra ataques csrf
-const { doubleCsrf } = require('csrf-csrf');
+const csrf = require('tiny-csrf');
 
 //express-rate-limit limita la cantidad de requests por ip
 const rateLimit = require('express-rate-limit');
@@ -61,7 +60,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 //para leer las cookies de los requests
-app.use(cookieParser());
+app.use(cookieParser(process.env.CSRF_SECRET));
 
 //rate limitting
 
@@ -107,27 +106,11 @@ app.use(session({
 
 //csrf
 
-//doubleCsrf usa el patron double submit cookie, se genera un token que se envia en cada form
-const { generateToken, doubleCsrfProtection } = doubleCsrf({
-  getSecret: () => process.env.CSRF_SECRET,
-  cookieName: 'x-csrf-token',
-  cookieOptions: {
-    sameSite: 'lax',
-    secure: process.env.NODE_ENV === 'production',
-    httpOnly: true
-  },
-  size: 64,
-
-  ignoredMethods: ['GET', 'HEAD', 'OPTIONS']
-});
-
-app.use(doubleCsrfProtection);
-
-//para hacer disponible csrfToken() en todos los requests
-app.use((req, res, next) => {
-  req.csrfToken = () => generateToken(req, res);
-  next();
-});
+//el token se envia en el campo csrf del formulario
+app.use(csrf(
+  process.env.CSRF_SECRET,  
+  ['POST', 'PUT', 'DELETE'] 
+));
 
 //motor de vistas
 
@@ -159,7 +142,7 @@ app.use((err, req, res, next) => {
     return res.status(403).render('login', {
       error: 'Token de seguridad inválido. Recargá la página e intentá de nuevo.',
       query: {},
-      csrfToken: req.csrfToken ? req.csrfToken() : ''
+      csrfToken: req.csrfToken()
     });
   }
   console.error('Error no manejado:', err);
