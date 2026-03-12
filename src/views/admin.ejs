@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PassPort Inc. — Admin</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+
+  <nav>
+    <div class="nav-right" style="gap:1.25rem">
+      <div class="nav-brand">PassPort Inc.</div>
+      <!--indicador de que es en el panel admin -->
+      <div class="nav-section">Panel Admin</div>
+    </div>
+    <a href="/dashboard" class="btn-back">← Volver</a>
+  </nav>
+
+  <div class="main-admin">
+
+    <!--para mostrar error si existe-->
+    <% if (error) { %>
+      <div class="alert"><%= error %></div>
+    <% } %>
+
+    <!--se muestra exito si existe-->
+    <% if (success) { %>
+      <div class="alert-success">✓ <%= success %></div>
+    <% } %>
+    <% if (typeof query !== 'undefined' && query && query.success) { %>
+      <div class="alert-success">✓ <%= query.success.replace(/\+/g, ' ') %></div>
+    <% } %>
+
+    <!--tabla de usuarios-->
+    <div class="section">
+      <div class="section-header">
+        <h2 class="section-title">Usuarios registrados</h2>
+        <span class="section-count"><%= users.length %> usuario(s)</span>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Email</th>
+              <th>Rol</th>
+              <th>Intentos fallidos</th>
+              <th>Bloqueado hasta</th>
+              <th>Registrado</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <!--sii no hay usuarios se muestra un mensaje-->
+            <% if (users.length === 0) { %>
+              <tr><td colspan="7" class="empty">No hay usuarios registrados</td></tr>
+            <% } else { %>
+              <% users.forEach(u => { %>
+                <tr>
+                  <td class="muted">#<%= u.id %></td>
+                  <td><%= u.email %></td>
+                  <td>
+                    <span class="badge <%= u.rol === 'administrador' ? 'badge-admin' : 'badge-user' %>">
+                      <%= u.rol %>
+                    </span>
+                  </td>
+                  <td class="<%= u.intentos_fallidos > 0 ? '' : 'muted' %>">
+                    <%= u.intentos_fallidos %>
+                  </td>
+                  <td class="muted">
+                    <%= u.bloqueado_hasta ? new Date(u.bloqueado_hasta).toLocaleString('es-AR') : '—' %>
+                  </td>
+                  <td class="muted">
+                    <%= new Date(u.created_at).toLocaleDateString('es-AR') %>
+                  </td>
+                  <td>
+                    <!--no se muestra el boton eliminar para el admin actual-->
+                    <% if (u.id !== user.id) { %>
+                      <form method="POST" action="/admin/users/<%= u.id %>/delete"
+                            onsubmit="return confirm('¿Eliminar a <%= u.email %>?')">
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                        <button type="submit" class="btn-delete">Eliminar</button>
+                      </form>
+                    <% } else { %>
+                      <span class="muted" style="font-size:0.75rem">Vos</span>
+                    <% } %>
+                  </td>
+                </tr>
+              <% }) %>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!--tabla de logs-->
+    <div class="section">
+      <div class="section-header">
+        <h2 class="section-title">Logs de seguridad</h2>
+        <span class="section-count">Últimos <%= logs.length %> eventos</span>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>IP</th>
+              <th>Email</th>
+              <th>Evento</th>
+              <th>Resultado</th>
+              <th>Razón</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (logs.length === 0) { %>
+              <tr><td colspan="6" class="empty">No hay eventos registrados</td></tr>
+            <% } else { %>
+              <% logs.forEach(log => { %>
+                <tr>
+                  <td class="muted" style="white-space:nowrap">
+                    <%= new Date(log.created_at).toLocaleString('es-AR') %>
+                  </td>
+                  <td class="muted"><%= log.ip || '—' %></td>
+                  <td><%= log.email || '—' %></td>
+                  <td><%= log.evento %></td>
+                  <td>
+                    <span class="badge <%= log.exitoso ? 'badge-ok' : 'badge-fail' %>">
+                      <%= log.exitoso ? 'OK' : 'FALLO' %>
+                    </span>
+                  </td>
+                  <td class="muted"><%= log.razon || '—' %></td>
+                </tr>
+              <% }) %>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>
