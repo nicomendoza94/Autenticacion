@@ -1,6 +1,6 @@
 # PassPort Inc. 🛂
 
-Sistema de autenticación y gestión de sesiones seguro. Proyecto #10 del bootcamp.
+Sistema de autenticación y gestión de sesiones seguro.
 
 ## Stack
 
